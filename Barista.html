@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Täç Coffee - Панель бариста</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6F4E37;
+            --primary-light: #A67B5B;
+            --accent: #D4A574;
+            --gold: #C9A961;
+            --cream: #F5F1E8;
+            --dark: #2C1810;
+            --success: #4CAF50;
+            --error: #e74c3c;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Логин */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--primary-light);
+            margin-bottom: 2rem;
+        }
+
+        .barista-select {
+            margin-bottom: 1.5rem;
+        }
+
+        .barista-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e0d5c7;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .barista-option:hover, .barista-option.selected {
+            border-color: var(--primary);
+            background: var(--cream);
+        }
+
+        .barista-option input {
+            margin-right: 1rem;
+        }
+
+        .pin-input {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .pin-digit {
+            width: 50px;
+            height: 60px;
+            border: 2px solid #e0d5c7;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .pin-digit:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .error-msg {
+            color: var(--error);
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .error-msg.show {
+            opacity: 1;
+        }
+
+        .btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+
+        /* Панель */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .barista-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .barista-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn-logout {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(111, 78, 55, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0d5c7;
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-search {
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .client-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(111, 78, 55, 0.1);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .client-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--cream);
+        }
+
+        .client-name-big {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .client-id-display {
+            color: var(--primary-light);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .stamps-display {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stamps-title {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .stamps-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stamp-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px dashed var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .stamp-small.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .free-alert {
+            background: linear-gradient(135deg, var(--success) 0%, #45a049 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        .actions-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .action-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .action-card {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .action-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .points-preview {
+            text-align: center;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+        }
+
+        .points-preview strong {
+            color: var(--success);
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold) 0%, #D4AF37 100%);
+            color: white;
+        }
+
+        .btn-gold:hover {
+            opacity: 0.9;
+        }
+
+        .rewards-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reward-item:hover {
+            border-color: var(--accent);
+        }
+
+        .reward-name {
+            font-weight: 500;
+        }
+
+        .reward-cost {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .logs-section {
+            margin-top: 3rem;
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(111, 78, 55, 0.1);
+        }
+
+        .logs-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--cream);
+            font-size: 0.9rem;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-info {
+            flex: 1;
+        }
+
+        .log-barista {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .log-action {
+            color: var(--primary-light);
+            font-size: 0.85rem;
+        }
+
+        .log-time {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .log-points {
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .log-points.minus {
+            color: var(--error);
+        }
+
+        .btn-clear-logs {
+            background: none;
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            animation: modalPop 0.3s;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-text {
+            color: var(--primary-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--error);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .login-card, .container {
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Экран входа -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <h1 class="login-title">👨‍🍳 Доступ для персонала</h1>
+            <p class="login-subtitle">Выберите себя и введите PIN-код</p>
+            
+            <div class="barista-select">
+                <label class="barista-option" onclick="selectBarista('Шанур', '2008')">
+                    <input type="radio" name="barista" value="Шанур">
+                    <span>Шанур (бариста)</span>
+                </label>
+                <label class="barista-option" onclick="selectBarista('Айша', '1501')">
+                    <input type="radio" name="barista" value="Айша">
+                    <span>Айша (бариста)</span>
+                </label>
+            </div>
+
+            <div class="pin-input">
+                <input type="password" class="pin-digit" maxlength="1" id="pin1" onkeyup="movePin(1)">
+                <input type="password" class="pin-digit" maxlength="1" id="pin2" onkeyup="movePin(2)">
+                <input type="password" class="pin-digit" maxlength="1" id="pin3" onkeyup="movePin(3)">
+                <input type="password" class="pin-digit" maxlength="1" id="pin4" onkeyup="movePin(4)">
+            </div>
+
+            <div class="error-msg" id="errorMsg">Неверный PIN-код</div>
+
+            <button class="btn btn-primary" onclick="loginBarista()">
+                Войти
+            </button>
+        </div>
+    </div>
+
+    <!-- Панель управления -->
+    <div id="panelScreen" class="hidden">
+        <div class="header">
+            <div class="logo">☕ Täç Coffee — Панель бариста</div>
+            <div class="barista-info">
+                <span class="barista-name" id="currentBaristaName">Имя</span>
+                <button class="btn-logout" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Поиск -->
+            <div class="search-card">
+                <h2 class="search-title">🔍 Найти клиента</h2>
+                <div class="search-input-group">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Введите ID (например: TC-12345) или телефон">
+                    <button class="btn-search" onclick="findClient()">Найти</button>
+                </div>
+            </div>
+
+            <!-- Панель клиента -->
+            <div id="clientPanel" class="client-panel hidden">
+                <div class="client-header">
+                    <div class="client-name-big" id="clientName">Имя клиента</div>
+                    <div class="client-id-display" id="clientId">ID: TC-00000</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="clientPoints">0</div>
+                        <div class="stat-label">баллов</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="clientLevel">🌱</div>
+                        <div class="stat-label">уровень</div>
+                    </div>
+                </div>
+
+                <div class="stamps-display">
+                    <div class="stamps-title">Штампы (10 = бесплатный напиток)</div>
+                    <div class="stamps-row" id="stampsRow"></div>
+                    <div id="freeDrinkAlert" class="free-alert hidden">
+                        🎉 У клиента 10 штампов! Можно выдать бесплатный напиток
+                    </div>
+                </div>
+
+                <!-- Действия -->
+                <div class="actions-title">⚡ Действия</div>
+                <div class="action-grid">
+                    <!-- Начисление -->
+                    <div class="action-card">
+                        <div class="action-label">💰 Начислить баллы за покупку</div>
+                        <input type="number" class="amount-input" id="purchaseAmount" placeholder="Сумма в TMT" oninput="calculatePoints()">
+                        <div class="points-preview">Будет начислено: <strong id="pointsCalc">0</strong> баллов + 1 штамп</div>
+                        <button class="btn-action btn-success" onclick="addPurchase()">Начислить</button>
+                    </div>
+
+                    <!-- Бесплатный напиток -->
+                    <div class="action-card" id="freeDrinkCard" style="opacity: 0.5; pointer-events: none;">
+                        <div class="action-label">☕ Выдать бесплатный напиток</div>
+                        <p style="color: var(--primary-light); margin-bottom: 1rem; font-size: 0.9rem;">
+                            Требуется 10 штампов. Сбросит штампы в 0.
+                        </p>
+                        <button class="btn-action btn-gold" onclick="giveFreeDrink()">Выдать бесплатный напиток</button>
+                    </div>
+
+                    <!-- Обмен баллов -->
+                    <div class="action-card">
+                        <div class="action-label">🎁 Обменять баллы на награду</div>
+                        <div class="rewards-list">
+                            <div class="reward-item" onclick="redeem(100, 'Круассан')">
+                                <span class="reward-name">🥐 Круассан</span>
+                                <span class="reward-cost">100 баллов</span>
+                            </div>
+                            <div class="reward-item" onclick="redeem(150, 'Капучино')">
+                                <span class="reward-name">☕ Капучино</span>
+                                <span class="reward-cost">150 баллов</span>
+                            </div>
+                            <div class="reward-item" onclick="redeem(300, 'Десерт + кофе')">
+                                <span class="reward-name">🍰 Десерт + кофе</span>
+                                <span class="reward-cost">300 баллов</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Логи операций -->
+            <div class="logs-section">
+                <div class="logs-title">
+                    <span>📋 История операций (сегодня)</span>
+                    <button class="btn-clear-logs" onclick="clearLogs()">Очистить</button>
+                </div>
+                <div id="logsList">
+                    <p style="text-align: center; color: #999;">Пока нет операций</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">✅</div>
+            <h3 class="modal-title" id="modalTitle">Готово!</h3>
+            <p class="modal-text" id="modalText">Операция выполнена</p>
+            <button class="btn btn-primary" onclick="closeModal()" style="width: 100%;">Закрыть</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ==================== НАСТРОЙКИ JSONBIN ====================
+        // ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ ИЗ JSONBIN!
+        const BIN_ID = '69a84436d0ea881f40ee642b';
+        const READ_KEY = '$2a$10$N4bdyaKy80lAPsIfhT6.AeojN.SzxdxwPnYRZnLTeB3k8vswVLlvG';
+        const MASTER_KEY = '$2a$10$QsZjCS0cK7DQ83gJogU3..IU6tWcQ50j2tSOJgd5dCf7.v9BHIj5y';
+        
+        const API_URL = `https://api.jsonbin.io/v3/b/69a84436d0ea881f40ee642b`;
+
+        // ==================== НАСТРОЙКИ БАРИСТ ====================
+        const BARISTAS = {
+            'Шанур': '2008', // ← ЗАМЕНИТЕ!
+            'Айша': '1501' // ← ЗАМЕНИТЕ!
+        };
+
+        // ==================== СОСТОЯНИЕ ====================
+        let currentBarista = null;
+        let currentClient = null;
+        let allUsers = {};
+        let logs = [];
+
+        // ==================== ВХОД ====================
+        function selectBarista(name, pin) {
+            document.querySelectorAll('.barista-option').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            currentBarista = { name, pin };
+            document.getElementById('pin1').focus();
+        }
+
+        function movePin(n) {
+            if (n < 4 && document.getElementById('pin' + n).value) {
+                document.getElementById('pin' + (n + 1)).focus();
+            }
+        }
+
+        function loginBarista() {
+            if (!currentBarista) {
+                showToast('Выберите бариста', 'error');
+                return;
+            }
+
+            const enteredPin = 
+                document.getElementById('pin1').value +
+                document.getElementById('pin2').value +
+                document.getElementById('pin3').value +
+                document.getElementById('pin4').value;
+
+            if (enteredPin === currentBarista.pin) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('panelScreen').classList.remove('hidden');
+                document.getElementById('currentBaristaName').textContent = currentBarista.name;
+                loadLogs();
+            } else {
+                document.getElementById('errorMsg').classList.add('show');
+                for (let i = 1; i <= 4; i++) {
+                    document.getElementById('pin' + i).value = '';
+                }
+                document.getElementById('pin1').focus();
+            }
+        }
+
+        function logout() {
+            currentBarista = null;
+            currentClient = null;
+            document.getElementById('panelScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('clientPanel').classList.add('hidden');
+            
+            document.querySelectorAll('.barista-option').forEach(el => {
+                el.classList.remove('selected');
+                el.querySelector('input').checked = false;
+            });
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('pin' + i).value = '';
+            }
+            document.getElementById('errorMsg').classList.remove('show');
+        }
+
+        // ==================== РАБОТА С ДАННЫМИ ====================
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/latest`, {
+                    headers: {
+                        'X-Access-Key': READ_KEY
+                    }
+                });
+                const data = await response.json();
+                allUsers = data.record.users || {};
+                return allUsers;
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                showToast('Ошибка подключения к серверу', 'error');
+                return {};
+            }
+        }
+
+        async function saveUsers() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': MASTER_KEY,
+                        'X-Bin-Private': 'false'
+                    },
+                    body: JSON.stringify({ users: allUsers })
+                });
+                
+                if (!response.ok) throw new Error('Ошибка сохранения');
+                return true;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                showToast('Ошибка сохранения данных', 'error');
+                return false;
+            }
+        }
+
+        // ==================== РАБОТА С КЛИЕНТАМИ ====================
+        async function findClient() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                showToast('Введите ID или телефон', 'error');
+                return;
+            }
+
+            await loadUsers();
+
+            // Ищем по ID
+            let user = allUsers[query];
+            
+            // Ищем по телефону
+            if (!user) {
+                user = Object.values(allUsers).find(u => u.phone === query);
+            }
+
+            if (user) {
+                currentClient = user;
+                showClient();
+            } else {
+                showToast('Клиент не найден', 'error');
+            }
+        }
+
+        function showClient() {
+            document.getElementById('clientPanel').classList.remove('hidden');
+            updateClientDisplay();
+        }
+
+        function updateClientDisplay() {
+            document.getElementById('clientName').textContent = currentClient.name;
+            document.getElementById('clientId').textContent = 'ID: ' + currentClient.id;
+            document.getElementById('clientPoints').textContent = currentClient.points || 0;
+            
+            const levels = { 'novice': '🌱', 'regular': '☕', 'vip': '👑' };
+            document.getElementById('clientLevel').textContent = levels[currentClient.level] || '🌱';
+
+            // Штампы
+            const row = document.getElementById('stampsRow');
+            row.innerHTML = '';
+            const stamps = currentClient.stamps || 0;
+            for (let i = 0; i < 10; i++) {
+                const stamp = document.createElement('div');
+                stamp.className = 'stamp-small' + (i < stamps ? ' active' : '');
+                if (i < stamps) stamp.textContent = '✓';
+                row.appendChild(stamp);
+            }
+
+            // Проверка бесплатного напитка
+            const freeAlert = document.getElementById('freeDrinkAlert');
+            const freeCard = document.getElementById('freeDrinkCard');
+            
+            if (stamps >= 10) {
+                freeAlert.classList.remove('hidden');
+                freeCard.style.opacity = '1';
+                freeCard.style.pointerEvents = 'auto';
+            } else {
+                freeAlert.classList.add('hidden');
+                freeCard.style.opacity = '0.5';
+                freeCard.style.pointerEvents = 'none';
+            }
+
+            document.getElementById('purchaseAmount').value = '';
+            document.getElementById('pointsCalc').textContent = '0';
+        }
+
+        function calculatePoints() {
+            const amount = parseInt(document.getElementById('purchaseAmount').value) || 0;
+            const points = Math.floor(amount / 10);
+            document.getElementById('pointsCalc').textContent = points;
+        }
+
+        async function addPurchase() {
+            const amount = parseInt(document.getElementById('purchaseAmount').value);
+            if (!amount || amount <= 0) {
+                showToast('Введите сумму покупки', 'error');
+                return;
+            }
+
+            const points = Math.floor(amount / 10);
+            currentClient.points = (currentClient.points || 0) + points;
+            currentClient.stamps = (currentClient.stamps || 0) + 1;
+            
+            // Уровень
+            if (currentClient.points >= 500) currentClient.level = 'vip';
+            else if (currentClient.points >= 200) currentClient.level = 'regular';
+            
+            // История
+            if (!currentClient.history) currentClient.history = [];
+            currentClient.history.push({
+                title: `Покупка на ${amount}₽`,
+                points: points,
+                type: 'purchase',
+                date: new Date().toISOString()
+            });
+
+            const saved = await saveUsers();
+            
+            if (saved) {
+                addLog('Начисление', `${currentClient.name} +${points} баллов`, points);
+                
+                if (currentClient.stamps >= 10) {
+                    showModal('🎉', 'Отлично!', `Начислено ${points} баллов. У клиента 10 штампов!`);
+                } else {
+                    showModal('✅', 'Готово!', `Клиент получил ${points} баллов`);
+                }
+                updateClientDisplay();
+            }
+        }
+
+        async function giveFreeDrink() {
+            if ((currentClient.stamps || 0) < 10) {
+                showToast('Недостаточно штампов', 'error');
+                return;
+            }
+
+            currentClient.stamps = 0;
+            
+            if (!currentClient.history) currentClient.history = [];
+            currentClient.history.push({
+                title: 'Бесплатный напиток (10 штампов)',
+                points: 0,
+                type: 'free',
+                date: new Date().toISOString()
+            });
+
+            const saved = await saveUsers();
+            
+            if (saved) {
+                addLog('Бесплатный напиток', `${currentClient.name} — обмен штампов`, 0);
+                showModal('☕', 'Выдано!', `Бесплатный напиток выдан клиенту ${currentClient.name}`);
+                updateClientDisplay();
+            }
+        }
+
+        async function redeem(cost, rewardName) {
+            if ((currentClient.points || 0) < cost) {
+                showToast(`Недостаточно баллов. Нужно: ${cost}`, 'error');
+                return;
+            }
+
+            currentClient.points -= cost;
+            
+            if (!currentClient.history) currentClient.history = [];
+            currentClient.history.push({
+                title: `Обмен: ${rewardName}`,
+                points: -cost,
+                type: 'redeem',
+                date: new Date().toISOString()
+            });
+
+            const saved = await saveUsers();
+            
+            if (saved) {
+                addLog('Обмен', `${currentClient.name} — ${rewardName}`, -cost);
+                showModal('🎁', 'Награда выдана!', `${rewardName} выдан клиенту ${currentClient.name}`);
+                updateClientDisplay();
+            }
+        }
+
+        // ==================== ЛОГИ ====================
+        function addLog(action, details, points) {
+            const log = {
+                barista: currentBarista.name,
+                action: action,
+                details: details,
+                points: points,
+                time: new Date().toISOString()
+            };
+            
+            logs.unshift(log);
+            
+            const today = new Date().toDateString();
+            localStorage.setItem('coffeeBrewLogs_' + today, JSON.stringify(logs));
+            
+            renderLogs();
+        }
+
+        function loadLogs() {
+            const today = new Date().toDateString();
+            const saved = localStorage.getItem('coffeeBrewLogs_' + today);
+            logs = saved ? JSON.parse(saved) : [];
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const list = document.getElementById('logsList');
+            
+            if (logs.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #999;">Пока нет операций</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            logs.forEach(log => {
+                const div = document.createElement('div');
+                div.className = 'log-item';
+                const time = new Date(log.time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+                
+                div.innerHTML = `
+                    <div class="log-info">
+                        <div class="log-barista">${log.barista}</div>
+                        <div class="log-action">${log.details}</div>
+                        <div class="log-time">${time}</div>
+                    </div>
+                    <div class="log-points ${log.points < 0 ? 'minus' : ''}">
+                        ${log.points > 0 ? '+' : ''}${log.points === 0 ? '★' : log.points}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function clearLogs() {
+            if (confirm('Очистить историю операций за сегодня?')) {
+                logs = [];
+                const today = new Date().toDateString();
+                localStorage.removeItem('coffeeBrewLogs_' + today);
+                renderLogs();
+            }
+        }
+
+        // ==================== UI ====================
+        function showModal(icon, title, text) {
+            document.getElementById('modalIcon').textContent = icon;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Enter в поиске
+        document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') findClient();
+        });
+
+        // Закрытие модалки по клику вне
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
