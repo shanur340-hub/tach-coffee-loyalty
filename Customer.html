@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Täç Coffee - Моя карта лояльности</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bronze: #CD7F32;
+            --bronze-light: #E8B89A;
+            --silver: #C0C0C0;
+            --silver-light: #E8E8E8;
+            --gold: #FFD700;
+            --gold-light: #FFF4B8;
+            --platinum: #E5E4E2;
+            --platinum-light: #F5F5F5;
+            --primary: #6F4E37;
+            --primary-light: #A67B5B;
+            --accent: #D4A574;
+            --cream: #F5F1E8;
+            --dark: #2C1810;
+            --success: #4CAF50;
+            --white: #FFFFFF;
+            --shadow: 0 10px 40px rgba(111, 78, 55, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--cream) 0%, #FFF 50%, var(--cream) 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        /* Шапка */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.8);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Карточка уровня */
+        .level-card {
+            background: linear-gradient(145deg, #fff 0%, #faf8f5 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .level-bronze {
+            background: linear-gradient(135deg, var(--bronze) 0%, var(--bronze-light) 100%);
+            color: white;
+        }
+
+        .level-silver {
+            background: linear-gradient(135deg, var(--silver) 0%, var(--silver-light) 100%);
+            color: var(--dark);
+        }
+
+        .level-gold {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+        }
+
+        .level-platinum {
+            background: linear-gradient(135deg, #B0B0B0 0%, var(--platinum) 100%);
+            color: var(--dark);
+            border: 2px solid #C0C0C0;
+        }
+
+        .level-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Прогресс до следующего уровня */
+        .progress-section {
+            margin: 1.5rem 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .progress-value {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #E8E0D5;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-bronze { background: linear-gradient(90deg, var(--bronze), var(--bronze-light)); }
+        .progress-silver { background: linear-gradient(90deg, var(--silver), #A0A0A0); }
+        .progress-gold { background: linear-gradient(90deg, var(--gold), #FFA500); }
+        .progress-platinum { background: linear-gradient(90deg, #A0A0A0, var(--platinum)); }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.8rem;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+        }
+
+        .progress-text strong {
+            color: var(--primary);
+        }
+
+        /* Баллы */
+        .points-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .points-box {
+            background: linear-gradient(145deg, var(--cream) 0%, #fff 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .points-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .points-box.bronze { border-color: var(--bronze-light); }
+        .points-box.silver { border-color: var(--silver); }
+        .points-box.gold { border-color: var(--gold); }
+        .points-box.platinum { border-color: #C0C0C0; }
+
+        .points-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .points-label {
+            font-size: 0.85rem;
+            color: var(--primary-light);
+            margin-top: 0.3rem;
+        }
+
+        /* QR секция */
+        .qr-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .qr-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .qr-container {
+            background: linear-gradient(145deg, var(--cream) 0%, #fff 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: inline-block;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+        }
+
+        .client-id {
+            font-family: 'Courier New', monospace;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .qr-hint {
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        /* Штампы */
+        .stamps-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stamps-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .stamps-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .stamps-count {
+            background: var(--accent);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.8rem;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .stamp {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #f0ebe3 0%, #e8e0d5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            border: 2px dashed var(--accent);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .stamp.active {
+            background: linear-gradient(135deg, var(--success) 0%, #45a049 100%);
+            border-color: var(--success);
+            color: white;
+            animation: stampPop 0.5s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        @keyframes stampPop {
+            0% { transform: scale(0) rotate(-180deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .free-drink-banner {
+            background: linear-gradient(135deg, var(--success) 0%, #45a049 100%);
+            color: white;
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin-top: 1.5rem;
+            text-align: center;
+            animation: pulse 2s infinite;
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .free-drink-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Уровни и привилегии */
+        .levels-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .levels-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .level-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s;
+            opacity: 0.5;
+        }
+
+        .level-item.current {
+            opacity: 1;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .level-item.unlocked {
+            opacity: 1;
+        }
+
+        .level-icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .level-bronze-bg { background: linear-gradient(135deg, var(--bronze), var(--bronze-light)); color: white; }
+        .level-silver-bg { background: linear-gradient(135deg, var(--silver), #A0A0A0); color: white; }
+        .level-gold-bg { background: linear-gradient(135deg, var(--gold), #FFA500); color: var(--dark); }
+        .level-platinum-bg { background: linear-gradient(135deg, #A0A0A0, var(--platinum)); color: var(--dark); border: 2px solid #C0C0C0; }
+
+        .level-info {
+            flex: 1;
+        }
+
+        .level-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .level-range {
+            font-size: 0.85rem;
+            color: var(--primary-light);
+        }
+
+        .level-benefits {
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            margin-top: 0.3rem;
+        }
+
+        .level-status {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-current { background: var(--success); color: white; }
+        .status-unlocked { background: var(--accent); color: white; }
+        .status-locked { background: #E0E0E0; color: #999; }
+
+        /* История */
+        .history-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .history-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--cream);
+            transition: all 0.3s;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item:hover {
+            background: var(--cream);
+            border-radius: 12px;
+        }
+
+        .history-info h4 {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .history-date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .history-points {
+            font-weight: 700;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .history-points.plus {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .history-points.minus {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .history-points.free {
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            color: var(--dark);
+        }
+
+        /* Кнопка выхода */
+        .logout-btn {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 2rem;
+            background: transparent;
+            color: var(--primary-light);
+            border: 2px solid var(--primary-light);
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        /* Формы */
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            color: var(--primary-light);
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0d5c7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(111, 78, 55, 0.3);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .points-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stamps-grid {
+                gap: 0.5rem;
+            }
+            
+            .level-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <div class="header">
+        <div class="logo">☕ Täç Coffee </div>
+        <div class="tagline">Программа лояльности для ценителей кофе</div>
+    </div>
+
+    <div class="container">
+        <!-- Форма входа -->
+        <div id="loginScreen">
+            <div class="form-card">
+                <h1 class="form-title">Добро пожаловать!</h1>
+                <p class="form-subtitle">Получайте бонусы за каждый кофе</p>
+                
+                <div id="registerForm">
+                    <div class="input-group">
+                        <label class="input-label">Ваше имя</label>
+                        <input type="text" class="input-field" id="regName" placeholder="Как к вам обращаться?">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Телефон</label>
+                        <input type="tel" class="input-field" id="regPhone" placeholder="+993 (xx) 00-00-00">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="register()" id="regBtn">
+                        Получить карту лояльности
+                    </button>
+                    
+                    <button class="btn-secondary" onclick="showLogin()">
+                        Уже есть карта? Войти
+                    </button>
+                </div>
+
+                <div id="existingLoginForm" class="hidden">
+                    <div class="input-group">
+                        <label class="input-label">Номер карты или телефон</label>
+                        <input type="text" class="input-field" id="loginId" placeholder="Введите ID или телефон">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="login()" id="loginBtn">Войти</button>
+                    <button class="btn-secondary" onclick="showRegister()">Назад к регистрации</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Личный кабинет -->
+        <div id="dashboard" class="hidden">
+            <!-- Карточка уровня -->
+            <div class="level-card">
+                <div class="level-badge" id="levelBadge">
+                    <span class="level-icon">🥉</span>
+                    <span id="levelText">BRONZE</span>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-title">Прогресс до следующего уровня</span>
+                        <span class="progress-value" id="progressValue">0/100</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">
+                        Нужно ещё <strong>100 баллов</strong> до уровня <strong>SILVER</strong>
+                    </div>
+                </div>
+
+                <div class="points-section">
+                    <div class="points-box" id="pointsBox">
+                        <div class="points-number" id="displayPoints">0</div>
+                        <div class="points-label">баллов</div>
+                    </div>
+                    <div class="points-box" id="stampsBox">
+                        <div class="points-number" id="displayStamps">0</div>
+                        <div class="points-label">штампов</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR код -->
+            <div class="qr-section">
+                <div class="qr-title">📱 Покажите на кассе для начисления баллов</div>
+                <div class="qr-container">
+                    <div id="qrcode"></div>
+                </div>
+                <div class="client-id" id="displayId">TC-00000</div>
+                <div class="qr-hint">Отсканируйте QR-код или назовите номер карты бариста</div>
+            </div>
+
+            <!-- Штампы -->
+            <div class="stamps-section">
+                <div class="stamps-header">
+                    <span class="stamps-title">🎁 Каждый 10-й напиток бесплатно!</span>
+                    <span class="stamps-count" id="stampsCount">0/10</span>
+                </div>
+                <div class="stamps-grid" id="stampsGrid"></div>
+                <div id="freeDrinkBanner" class="free-drink-banner hidden">
+                    <div class="free-drink-title">🎉 Поздравляем!</div>
+                    <div>У вас бесплатный напиток! Покажите это бариста</div>
+                </div>
+            </div>
+
+            <!-- Уровни и привилегии -->
+            <div class="levels-section">
+                <div class="levels-title">🏆 Уровни и привилегии</div>
+                
+                <div class="level-item" id="levelBronze">
+                    <div class="level-icon-box level-bronze-bg">🥉</div>
+                    <div class="level-info">
+                        <div class="level-name">BRONZE</div>
+                        <div class="level-range">0 — 99 баллов</div>
+                        <div class="level-benefits">✓ 1 балл за каждые 20TMT ✓ Приветственный бонус</div>
+                    </div>
+                    <div class="level-status status-locked" id="statusBronze">Начальный</div>
+                </div>
+
+                <div class="level-item" id="levelSilver">
+                    <div class="level-icon-box level-silver-bg">🥈</div>
+                    <div class="level-info">
+                        <div class="level-name">SILVER</div>
+                        <div class="level-range">100 — 299 баллов</div>
+                        <div class="level-benefits">✓ 1.5 балла за 20TMT ✓ Бесплатный сироп ✓ Скидка 5%</div>
+                    </div>
+                    <div class="level-status status-locked" id="statusSilver">Заблокирован</div>
+                </div>
+
+                <div class="level-item" id="levelGold">
+                    <div class="level-icon-box level-gold-bg">🥇</div>
+                    <div class="level-info">
+                        <div class="level-name">GOLD</div>
+                        <div class="level-range">300 — 599 баллов</div>
+                        <div class="level-benefits">✓ 2 балла за 20TMT ✓ Бесплатный размер L ✓ Скидка 10%</div>
+                    </div>
+                    <div class="level-status status-locked" id="statusGold">Заблокирован</div>
+                </div>
+
+                <div class="level-item" id="levelPlatinum">
+                    <div class="level-icon-box level-platinum-bg">💎</div>
+                    <div class="level-info">
+                        <div class="level-name">PLATINUM</div>
+                        <div class="level-range">600+ баллов</div>
+                        <div class="level-benefits">✓ 3 балла за 20TMT ✓ Еженедельный бесплатный кофе ✓ Скидка 15%</div>
+                    </div>
+                    <div class="level-status status-locked" id="statusPlatinum">Заблокирован</div>
+                </div>
+            </div>
+
+            <!-- История -->
+            <div class="history-section">
+                <div class="history-header">
+                    <span class="history-title">📋 История операций</span>
+                </div>
+                <div id="historyList"></div>
+            </div>
+
+            <button class="logout-btn" onclick="logout()">Выйти из аккаунта</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ==================== НАСТРОЙКИ JSONBIN ====================
+        const BIN_ID = '69a84436d0ea881f40ee642b';
+        const READ_KEY = '$2a$10$N4bdyaKy80lAPsIfhT6.AeojN.SzxdxwPnYRZnLTeB3k8vswVLlvG';
+        const MASTER_KEY = '$2a$10$QsZjCS0cK7DQ83gJogU3..IU6tWcQ50j2tSOJgd5dCf7.v9BHIj5y';
+        
+        const API_URL = `https://api.jsonbin.io/v3/b/69a84436d0ea881f40ee642b`;
+
+        // ==================== НАСТРОЙКИ УРОВНЕЙ ====================
+        const LEVELS = {
+            bronze: { name: 'BRONZE', icon: '🥉', min: 0, max: 99, next: 'silver', multiplier: 1 },
+            silver: { name: 'SILVER', icon: '🥈', min: 100, max: 299, next: 'gold', multiplier: 1.5 },
+            gold: { name: 'GOLD', icon: '🥇', min: 300, max: 599, next: 'platinum', multiplier: 2 },
+            platinum: { name: 'PLATINUM', icon: '💎', min: 600, max: Infinity, next: null, multiplier: 3 }
+        };
+
+        let currentUser = null;
+        let allUsers = {};
+
+        // ==================== ФУНКЦИИ ====================
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('existingLoginForm').classList.remove('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('existingLoginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading"></span>';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btnId === 'regBtn' ? 'Получить карту лояльности' : 'Войти';
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/latest`, {
+                    headers: { 'X-Access-Key': READ_KEY }
+                });
+                const data = await response.json();
+                allUsers = data.record.users || {};
+                return allUsers;
+            } catch (error) {
+                showToast('Ошибка подключения к серверу');
+                return {};
+            }
+        }
+
+        async function saveUser(user) {
+            try {
+                allUsers[user.id] = user;
+                const response = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': MASTER_KEY,
+                        'X-Bin-Private': 'false'
+                    },
+                    body: JSON.stringify({ users: allUsers })
+                });
+                return response.ok;
+            } catch (error) {
+                showToast('Ошибка сохранения данных');
+                return false;
+            }
+        }
+
+        function getLevel(points) {
+            if (points >= 600) return 'platinum';
+            if (points >= 300) return 'gold';
+            if (points >= 100) return 'silver';
+            return 'bronze';
+        }
+
+        function getProgress(points) {
+            const level = getLevel(points);
+            const levelData = LEVELS[level];
+            
+            if (level === 'platinum') {
+                return { percent: 100, current: points, need: 0, next: null };
+            }
+            
+            const nextLevel = LEVELS[levelData.next];
+            const range = nextLevel.min - levelData.min;
+            const progress = points - levelData.min;
+            const percent = Math.min(100, Math.round((progress / range) * 100));
+            
+            return {
+                percent,
+                current: points,
+                need: nextLevel.min - points,
+                next: nextLevel.name
+            };
+        }
+
+        async function register() {
+            const name = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+
+            if (!name || !phone) {
+                showToast('Заполните все поля');
+                return;
+            }
+
+            setLoading('regBtn', true);
+            await loadUsers();
+
+            const id = 'CB-' + Date.now().toString().slice(-5);
+            
+            const user = {
+                id: id,
+                name: name,
+                phone: phone,
+                points: 0,
+                stamps: 0,
+                level: 'bronze',
+                history: [{
+                    title: 'Добро пожаловать в программу лояльности!',
+                    points: 0,
+                    type: 'welcome',
+                    date: new Date().toISOString()
+                }],
+                createdAt: new Date().toISOString()
+            };
+
+            const saved = await saveUser(user);
+            if (saved) {
+                currentUser = user;
+                showToast('Добро пожаловать, ' + name + '!');
+                showDashboard();
+            }
+            setLoading('regBtn', false);
+        }
+
+        async function login() {
+            const loginId = document.getElementById('loginId').value.trim();
+            if (!loginId) {
+                showToast('Введите ID или телефон');
+                return;
+            }
+
+            setLoading('loginBtn', true);
+            await loadUsers();
+
+            let user = allUsers[loginId];
+            if (!user) {
+                user = Object.values(allUsers).find(u => u.phone === loginId);
+            }
+
+            if (user) {
+                currentUser = user;
+                showToast('С возвращением, ' + user.name + '!');
+                showDashboard();
+            } else {
+                showToast('Клиент не найден');
+            }
+            setLoading('loginBtn', false);
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('qrcode').innerHTML = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            updateDisplay();
+
+            document.getElementById('qrcode').innerHTML = '';
+            new QRCode(document.getElementById('qrcode'), {
+                text: currentUser.id,
+                width: 180,
+                height: 180,
+                colorDark: '#6F4E37',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function updateDisplay() {
+            const points = currentUser.points || 0;
+            const stamps = currentUser.stamps || 0;
+            const level = getLevel(points);
+            const levelData = LEVELS[level];
+            const progress = getProgress(points);
+
+            // Обновляем бейдж уровня
+            const badge = document.getElementById('levelBadge');
+            badge.className = 'level-badge level-' + level;
+            badge.innerHTML = `<span class="level-icon">${levelData.icon}</span><span id="levelText">${levelData.name}</span>`;
+
+            // Обновляем прогресс-бар
+            document.getElementById('progressValue').textContent = `${progress.current}/${levelData.max === Infinity ? '∞' : levelData.next ? LEVELS[levelData.next].min : 'MAX'}`;
+            
+            const fill = document.getElementById('progressFill');
+            fill.style.width = progress.percent + '%';
+            fill.className = 'progress-fill progress-' + level;
+
+            const progressText = document.getElementById('progressText');
+            if (progress.next) {
+                progressText.innerHTML = `Нужно ещё <strong>${progress.need} баллов</strong> до уровня <strong>${progress.next}</strong>`;
+            } else {
+                progressText.innerHTML = `🎉 Вы достигли максимального уровня! <strong>PLATINUM</strong>`;
+            }
+
+            // Обновляем баллы и штампы
+            document.getElementById('displayPoints').textContent = points;
+            document.getElementById('displayStamps').textContent = stamps;
+            document.getElementById('displayId').textContent = currentUser.id;
+            document.getElementById('stampsCount').textContent = `${stamps}/10`;
+
+            // Обновляем цвета боксов
+            ['pointsBox', 'stampsBox'].forEach(id => {
+                const box = document.getElementById(id);
+                box.className = 'points-box ' + level;
+            });
+
+            // Штампы
+            const grid = document.getElementById('stampsGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const stamp = document.createElement('div');
+                stamp.className = 'stamp' + (i < stamps ? ' active' : '');
+                if (i < stamps) stamp.textContent = '☕';
+                grid.appendChild(stamp);
+            }
+
+            // Бесплатный напиток
+            const banner = document.getElementById('freeDrinkBanner');
+            if (stamps >= 10) {
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            // Обновляем статусы уровней
+            updateLevelStatuses(level);
+
+            // История
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            const history = currentUser.history || [];
+            if (history.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #999;">Пока нет операций</p>';
+            } else {
+                history.slice().reverse().forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    const isMinus = item.points < 0;
+                    const isFree = item.points === 0 && item.type === 'free';
+                    let pointsClass = 'plus';
+                    let pointsText = '+' + item.points;
+                    
+                    if (isMinus) {
+                        pointsClass = 'minus';
+                        pointsText = item.points;
+                    } else if (isFree) {
+                        pointsClass = 'free';
+                        pointsText = '★ БЕСПЛАТНО';
+                    }
+
+                    div.innerHTML = `
+                        <div class="history-info">
+                            <h4>${item.title}</h4>
+                            <div class="history-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="history-points ${pointsClass}">${pointsText}</div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        function updateLevelStatuses(currentLevel) {
+            const levels = ['bronze', 'silver', 'gold', 'platinum'];
+            const currentIndex = levels.indexOf(currentLevel);
+
+            levels.forEach((lvl, index) => {
+                const item = document.getElementById('level' + lvl.charAt(0).toUpperCase() + lvl.slice(1));
+                const status = document.getElementById('status' + lvl.charAt(0).toUpperCase() + lvl.slice(1));
+                
+                item.classList.remove('current', 'unlocked');
+                
+                if (index === currentIndex) {
+                    item.classList.add('current');
+                    status.textContent = 'Текущий';
+                    status.className = 'level-status status-current';
+                } else if (index < currentIndex) {
+                    item.classList.add('unlocked');
+                    status.textContent = 'Получен';
+                    status.className = 'level-status status-unlocked';
+                } else {
+                    status.textContent = 'Заблокирован';
+                    status.className = 'level-status status-locked';
+                }
+            });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU') + ' ' + date.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
